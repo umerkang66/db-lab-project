@@ -15,9 +15,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'User already exists' }, { status: 400 });
   }
 
+  const role = email === 'ugulzar4512@gmail.com' ? 'admin' : 'customer';
+
   await pool.query(
     'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)',
-    [name, email, hashedPassword, 'customer']
+    [name, email, hashedPassword, role]
   );
 
   return NextResponse.json({ success: true });
