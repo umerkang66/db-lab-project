@@ -1,10 +1,9 @@
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import pool from '@/lib/db';
-import { User } from '@/lib/types';
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -39,22 +38,19 @@ const handler = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log({ token, user });
       if (user) token.user = user;
       return token;
     },
     async session({ session, token }) {
-      console.log({ session });
-
-      const tokenUser = token.user as User;
-      session.user = tokenUser;
-      return session;
+      return { ...session, user: token.user };
     },
   },
   pages: {
     signIn: '/auth/signin',
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

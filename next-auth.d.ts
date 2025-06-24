@@ -8,7 +8,7 @@ declare module 'next-auth' {
       name: string;
       email: string;
       role: 'customer' | 'admin';
-      created_at: string;
+      created_at: Date;
     };
   }
 
@@ -17,7 +17,7 @@ declare module 'next-auth' {
     name: string;
     email: string;
     role: 'customer' | 'admin';
-    created_at: string;
+    created_at: Date;
   }
 }
 
@@ -28,7 +28,7 @@ declare module 'next-auth/jwt' {
       name: string;
       email: string;
       role: 'customer' | 'admin';
-      created_at: string;
+      created_at: Date;
     };
   }
 }

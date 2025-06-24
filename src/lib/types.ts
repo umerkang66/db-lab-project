@@ -4,5 +4,5 @@ export type User = {
   email: string;
   password: string;
   role: 'customer' | 'admin';
-  created_at: string;
+  created_at: Date;
 };
