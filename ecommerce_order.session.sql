@@ -74,8 +74,8 @@ VALUES
 
 INSERT INTO addresses (user_id, address_line, city, postal_code, country)
 VALUES 
-  ('e77f5446-84d2-424a-9a3a-5dda2a604505', '123 Main Street', 'Lahore', '54000', 'Pakistan'),
-  ('ebe7c3df-d09f-43dc-862a-557f0ccc5614', '45 Garden Ave', 'Karachi', '75500', 'Pakistan');
+  ('7952dfe4-d5dd-4819-a754-0add28c92d77', '123 Main Street', 'Lahore', '54000', 'Pakistan'),
+  ('3ac564c1-abbc-4fe6-bd24-46af0be5f67a', '45 Garden Ave', 'Karachi', '75500', 'Pakistan');
 
 -- ADD 2 ITEMS IN CART
 SELECT * from users;
@@ -83,16 +83,18 @@ Select * from products;
 
 INSERT INTO cart (user_id, product_id, quantity)
 VALUES (
-    '88c7e2a1-9ba4-46bc-85ce-df6dfda45870',
-    '3ba98704-4ddf-4688-ab90-7dc191ee87c7',
+    '3ac564c1-abbc-4fe6-bd24-46af0be5f67a',
+    '495c3f31-135b-4296-8646-c53184ce8b98',
     2
 );
 INSERT INTO cart (user_id, product_id, quantity)
 VALUES (
-    '88c7e2a1-9ba4-46bc-85ce-df6dfda45870',
-    '95de6864-7a8e-4851-9f5f-3b6acd419d2e',
+    '3ac564c1-abbc-4fe6-bd24-46af0be5f67a',
+    '318cc4f3-376c-4cff-ae2e-f0f6889dca03',
     2
 );
+
+SELECT * FROM cart;
 
 -- NOW CREATE ORDER
 -- Create the address of user
@@ -102,14 +104,10 @@ VALUES (
 SELECT * FROM users;
 SELECT * FROM addresses;
 
-INSERT INTO addresses (user_id, address_line, city, postal_code, country)
-VALUES 
-  ('88c7e2a1-9ba4-46bc-85ce-df6dfda45870', 'UMT Johar Town', 'Lahore', '54000', 'Pakistan');
-
 INSERT INTO orders (user_id, address_id, status)
 VALUES (
-    '88c7e2a1-9ba4-46bc-85ce-df6dfda45870',
-    '3282e74c-763e-42e2-bbec-4246df28977f',
+    '3ac564c1-abbc-4fe6-bd24-46af0be5f67a',
+    '544f921e-b740-4423-8953-9c8ba7a2632a',
     'unpaid'
 );
 
@@ -118,27 +116,31 @@ SELECT * FROM cart;
 
 INSERT INTO order_items (order_id, product_id, quantity)
 VALUES (
-    'a037ca5e-9ad3-4a26-b6e1-80440598a9af',
-    '3ba98704-4ddf-4688-ab90-7dc191ee87c7',
+    '32ca02d5-bf55-416b-ae28-c5da9319dff6',
+    '495c3f31-135b-4296-8646-c53184ce8b98',
     2
 ), (
-    'a037ca5e-9ad3-4a26-b6e1-80440598a9af',
-    '95de6864-7a8e-4851-9f5f-3b6acd419d2e',
+    '32ca02d5-bf55-416b-ae28-c5da9319dff6',
+    '318cc4f3-376c-4cff-ae2e-f0f6889dca03',
     2
 );
 
 SELECT * FROM order_items;
 
 -- Delete items from the cart, that have been added to the order
+SELECT * FROM cart;
 DELETE FROM cart WHERE 
-product_id = '3ba98704-4ddf-4688-ab90-7dc191ee87c7' 
-OR product_id  = '95de6864-7a8e-4851-9f5f-3b6acd419d2e';
+product_id = 
+'495c3f31-135b-4296-8646-c53184ce8b98' 
+OR product_id  = '318cc4f3-376c-4cff-ae2e-f0f6889dca03';
 SELECT * FROM cart;
 
 -- PAYMENTS
 -- Now create the payment of order that we create
 -- above and update the status of order to paid
 -- Get the total amount of order by order_id
+SELECT * FROM orders;
+
 SELECT 
     SUM(oi.quantity * p.price) AS total_amount
 FROM 
@@ -146,13 +148,13 @@ FROM
 JOIN 
     products p ON oi.product_id = p.product_id
 WHERE 
-    oi.order_id = 'a037ca5e-9ad3-4a26-b6e1-80440598a9af';
+    oi.order_id = '32ca02d5-bf55-416b-ae28-c5da9319dff6';
 
 INSERT INTO payments(order_id, payment_method, amount, status, paid_at)
 VALUES (
-    'a037ca5e-9ad3-4a26-b6e1-80440598a9af',
+    '32ca02d5-bf55-416b-ae28-c5da9319dff6',
     'cod',
-    14398, 
+    8396, 
     'paid',
     CURRENT_TIMESTAMP
 );
