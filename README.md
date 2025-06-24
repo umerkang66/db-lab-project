@@ -5,7 +5,7 @@
 - Muhammad Umer F2023266912
 - Abdul Majid F2023266946
 - Haider Ali F2023266933
-- Haseeb Ullah
+- Haseeb Ullah F20232661009
 
 To run the project, you should have Node.JS and a running Postgres Instance.
 
