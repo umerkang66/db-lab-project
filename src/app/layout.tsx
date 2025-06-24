@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import pool, { initDb } from '@/lib/db';
+import { Header } from '@/components/header';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -33,9 +34,7 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 bg-emerald-50`}
         >
-          <header className="text-gray-100 bg-emerald-700 py-7 px-4">
-            <h1 className="text-3xl font-bold">Ecommerce Order Management</h1>
-          </header>
+          <Header />
           <div className="px-7">{children}</div>
         </body>
       </html>
@@ -48,9 +47,7 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 bg-emerald-50`}
         >
-          <header className="text-gray-100 bg-emerald-700 py-7 px-4">
-            <h1 className="text-3xl font-bold">Ecommerce Order Management</h1>
-          </header>
+          <Header />
           <div className="flex items-center justify-center h-[600px]">
             <div className="p-3 rounded bg-red-600 text-white text-2xl">
               Something Went wrong.

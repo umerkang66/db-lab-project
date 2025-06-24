@@ -17,7 +17,7 @@ export async function initDb(pool: Pool) {
         role VARCHAR(20) DEFAULT 'customer', -- admin
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
-
+      
       CREATE TABLE IF NOT EXISTS products (
         product_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name VARCHAR(100),
