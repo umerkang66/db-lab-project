@@ -30,7 +30,8 @@ Copy `sample.env.local` to `.env.local`, then add the deps.
 Run the Project.
 
 ```bash
-npm run dev
+npm run build
+npm run start
 ```
 
 To visit the app as ADMIN register as email `ugulzar4512@gmail.com`
