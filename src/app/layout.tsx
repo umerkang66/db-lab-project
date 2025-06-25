@@ -1,30 +1,30 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
-import { getServerSession } from 'next-auth';
-import Link from 'next/link';
-import { Toaster } from 'react-hot-toast';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { getServerSession } from "next-auth";
+import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
-import pool, { initDb } from '@/lib/db';
-import { Header } from '@/components/header';
-import { CartProvider } from '@/contexts/cart-context';
-import { Providers } from '@/components/providers';
-import { authOptions } from '@/lib/auth-options';
+import pool from "@/lib/db";
+import { Header } from "@/components/header";
+import { CartProvider } from "@/contexts/cart-context";
+import { Providers } from "@/components/providers";
+import { authOptions } from "@/lib/auth-options";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: 'Ecommerce Order Management',
+  title: "Ecommerce Order Management",
   description:
-    'A Database Lab Semester Project for managing ecommerce orders in SQL',
+    "A Database Lab Semester Project for managing ecommerce orders in SQL",
 };
 
 export default async function RootLayout({
@@ -36,7 +36,6 @@ export default async function RootLayout({
 
   try {
     // if database is not connected, error will be shown from the start.
-    await initDb(pool);
 
     return (
       <html lang="en">
@@ -47,7 +46,7 @@ export default async function RootLayout({
             <CartProvider>
               <Header />
               <div className="px-7 pb-7">{children}</div>
-              {session && session.user && session.user.role === 'admin' && (
+              {session && session.user && session.user.role === "admin" && (
                 <div className="fixed bottom-12 right-10 z-50">
                   <Link
                     href="/new"
@@ -64,7 +63,7 @@ export default async function RootLayout({
       </html>
     );
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error("Error initializing database:", error);
 
     return (
       <html lang="en">
