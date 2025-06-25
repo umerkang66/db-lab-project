@@ -15,13 +15,13 @@ export async function Header() {
       {!session?.user ? (
         <div>
           <Link
-            className="mr-2 rounded px-4 py-2 bg-emerald-950"
+            className="mr-2 rounded px-4 py-2 text-gray-900 bg-emerald-300"
             href="/auth/signin"
           >
             Signin
           </Link>
           <Link
-            className="rounded px-4 py-2 bg-emerald-950"
+            className="rounded px-4 py-2 text-gray-900 bg-emerald-300"
             href="/auth/signup"
           >
             Signup
