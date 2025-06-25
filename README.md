@@ -32,3 +32,5 @@ Run the Project.
 ```bash
 npm run dev
 ```
+
+To visit the app as ADMIN register as email `ugulzar4512@gmail.com`
