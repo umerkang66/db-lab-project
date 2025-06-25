@@ -27,6 +27,12 @@ npm install
 
 Copy `sample.env.local` to `.env.local`, then add the deps.
 
+Initialize the DB
+
+```bash
+npm run seed
+```
+
 Run the Project.
 
 ```bash
