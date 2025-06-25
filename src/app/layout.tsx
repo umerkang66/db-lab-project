@@ -3,10 +3,13 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
+import { Toaster } from 'react-hot-toast';
 
-import { authOptions } from './api/auth/[...nextauth]/route';
 import pool, { initDb } from '@/lib/db';
 import { Header } from '@/components/header';
+import { CartProvider } from '@/contexts/cart-context';
+import { Providers } from '@/components/providers';
+import { authOptions } from '@/lib/auth-options';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -40,19 +43,23 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 bg-emerald-50`}
         >
-          <Header />
-          <div className="px-7 pb-7">{children}</div>
-          {/* TODO: change customer to admin */}
-          {session && session.user && session.user.role === 'customer' && (
-            <div className="fixed bottom-12 right-10 z-50">
-              <Link
-                href="/new"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded shadow-lg font-semibold transition"
-              >
-                Create New Product
-              </Link>
-            </div>
-          )}
+          <Providers>
+            <CartProvider>
+              <Header />
+              <div className="px-7 pb-7">{children}</div>
+              {session && session.user && session.user.role === 'customer' && (
+                <div className="fixed bottom-12 right-10 z-50">
+                  <Link
+                    href="/new"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded shadow-lg font-semibold transition"
+                  >
+                    Create New Product
+                  </Link>
+                </div>
+              )}
+            </CartProvider>
+          </Providers>
+          <Toaster position="bottom-right" />
         </body>
       </html>
     );

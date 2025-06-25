@@ -24,19 +24,10 @@ export async function initDb(pool: Pool) {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE IF NOT EXISTS addresses (
-      address_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id UUID REFERENCES users(user_id),
-      address_line TEXT,
-      city VARCHAR(50),
-      postal_code VARCHAR(10),
-      country VARCHAR(50)
-    );
-
     CREATE TABLE IF NOT EXISTS orders (
       order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID REFERENCES users(user_id),
-      address_id UUID REFERENCES addresses(address_id),
+      address text,
       status VARCHAR(20) DEFAULT 'unpaid', -- unpaid / paid
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

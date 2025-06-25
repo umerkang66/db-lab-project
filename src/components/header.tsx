@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { SignoutBtn } from './signout-btn';
+import { CartBtn } from './cart-btn';
 
 export async function Header() {
   const session = await getServerSession();
@@ -26,10 +27,17 @@ export async function Header() {
           </Link>
         </div>
       ) : (
-        <div>
+        <div className="flex items-center gap-2">
           <span className="mr-4 text-gray-200">
             Welcome, {session.user.name || session.user.email}!
           </span>
+          <Link
+            className="px-4 rounded py-2 bg-emerald-300 text-black mr-2"
+            href="my-orders"
+          >
+            My Orders
+          </Link>
+          <CartBtn />
           <SignoutBtn />
         </div>
       )}
