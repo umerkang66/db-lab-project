@@ -9,6 +9,16 @@
 
 To run the project, you should have Node.JS and a running Postgres Instance.
 
+To start the Postgres Instance on GitPod or CodeSpace Run.
+
+```bash
+docker run -d -p 5432:5432 -e POSTGRES_USER=umer -e POSTGRES_USER=password postgres
+docker ps
+docker exec -it <container_id> bash
+psql -U umer
+create database ecommerce_order_management
+```
+
 Install the Deps.
 
 ```bash
