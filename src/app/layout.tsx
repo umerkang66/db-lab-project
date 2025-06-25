@@ -47,7 +47,7 @@ export default async function RootLayout({
             <CartProvider>
               <Header />
               <div className="px-7 pb-7">{children}</div>
-              {session && session.user && session.user.role === 'customer' && (
+              {session && session.user && session.user.role === 'admin' && (
                 <div className="fixed bottom-12 right-10 z-50">
                   <Link
                     href="/new"

@@ -36,3 +36,62 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const { product_id } = await req.json();
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM products WHERE product_id = $1 RETURNING *',
+      [product_id]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (err) {
+    console.error('DB error:', err);
+    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const { product_id, name, description, price, stock_quantity } =
+    await req.json();
+
+  if (!name || !description || isNaN(price) || isNaN(stock_quantity)) {
+    return NextResponse.json(
+      { error: 'Invalid product data' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      UPDATE products
+      SET name = $1,
+          description = $2,
+          price = $3,
+          stock_quantity = $4
+      WHERE product_id = $5
+      RETURNING *
+      `,
+      [name, description, price, stock_quantity, product_id]
+    );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { success: true, product: result.rows[0] },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error('DB error:', err);
+    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  }
+}

@@ -2,9 +2,10 @@ import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 import { SignoutBtn } from './signout-btn';
 import { CartBtn } from './cart-btn';
+import { authOptions } from '@/lib/auth-options';
 
 export async function Header() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   return (
     <header className="flex items-center justify-between text-gray-100 bg-emerald-700 py-7 px-4">
@@ -31,12 +32,34 @@ export async function Header() {
           <span className="mr-4 text-gray-200">
             Welcome, {session.user.name || session.user.email}!
           </span>
-          <Link
-            className="px-4 rounded py-2 bg-emerald-300 text-black mr-2"
-            href="my-orders"
-          >
-            My Orders
-          </Link>
+          {session && session.user && (
+            <>
+              {session.user.role === 'admin' ? (
+                <>
+                  <Link
+                    className="px-4 rounded py-2 bg-emerald-300 text-black mr-2"
+                    href="orders"
+                  >
+                    All Orders
+                  </Link>
+                  <Link
+                    className="px-4 rounded py-2 bg-emerald-300 text-black mr-2"
+                    href="products"
+                  >
+                    All Products
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  className="px-4 rounded py-2 bg-emerald-300 text-black mr-2"
+                  href="my-orders"
+                >
+                  My Orders
+                </Link>
+              )}
+            </>
+          )}
+
           <CartBtn />
           <SignoutBtn />
         </div>
