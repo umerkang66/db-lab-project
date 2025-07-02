@@ -1,6 +1,6 @@
-const { Pool } = require("pg");
-const dotenv = require("dotenv");
-dotenv.config({ path: "./.env.local" });
+const { Pool } = require('pg');
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env.local' });
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -58,7 +58,7 @@ async function initDb(pool) {
     );  
   `);
 
-  console.log("DONE.");
+  console.log('DONE.');
 }
 
 initDb(pool);
