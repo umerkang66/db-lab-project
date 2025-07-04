@@ -9,4 +9,7 @@ COPY . .
 
 EXPOSE 3000
 
+COPY wait-for.sh /wait-for.sh
+RUN chmod +x /wait-for.sh
+
 CMD ["npm", "run", "dev"]

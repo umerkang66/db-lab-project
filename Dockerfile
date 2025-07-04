@@ -22,6 +22,9 @@ COPY --from=builder /app/node_modules node_modules
 COPY --from=builder /app/src src
 COPY --from=builder /app/.env.* .
 
+COPY wait-for.sh /wait-for.sh
+RUN chmod +x /wait-for.sh
+
 EXPOSE 3000
 
 CMD ["npm", "start"]

@@ -4,14 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
+      - "3000:3000"
     env_file:
       - .env.local
     environment:
       - NODE_ENV=production
     depends_on:
       - db
-    command: sh -c "npm run seed && npm start"
+    command: sh -c "/wait-for.sh db npm run seed && npm start"
 
   db:
     image: postgres
@@ -21,7 +21,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ecommerce_order_management
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
