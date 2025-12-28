@@ -30,7 +30,7 @@ Copy `sample.env.local` to `.env.local`, then add the deps.
 Initialize the DB
 
 ```bash
-bun run seed
+bun run init_db
 ```
 
 Run the Project.

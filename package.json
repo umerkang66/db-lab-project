@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "init_db": "node src/lib/init_db.js",
     "seed": "node src/lib/seed.js"
   },
   "dependencies": {

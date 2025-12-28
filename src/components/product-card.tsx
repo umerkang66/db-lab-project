@@ -3,7 +3,8 @@
 import { useCart } from '@/contexts/cart-context';
 import { Product } from '@/lib/types';
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   FiShoppingCart,
@@ -11,6 +12,7 @@ import {
   FiEye,
   FiPackage,
   FiCheck,
+  FiX,
 } from 'react-icons/fi';
 import { ImSpinner2 } from 'react-icons/im';
 
@@ -251,115 +253,212 @@ export function ProductCard({ product, viewMode = 'grid' }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Quick View Modal */}
-      {showQuickView && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
-          onClick={() => setShowQuickView(false)}
-        >
-          <div
-            className="bg-white rounded-3xl max-w-2xl w-full p-8 animate-scale-in shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex gap-8">
-              <div className="w-1/2">
-                <div className="aspect-square bg-gradient-to-br from-emerald-100 to-teal-50 rounded-2xl flex items-center justify-center">
-                  <FiPackage className="text-8xl text-emerald-300" />
-                </div>
-              </div>
-              <div className="w-1/2 flex flex-col">
-                <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                  {product.name}
-                </h2>
-                <p className="text-gray-500 mb-6 flex-1">
-                  {product.description}
-                </p>
-
-                <div className="space-y-4">
-                  <div className="text-3xl font-bold text-emerald-600">
-                    Rs {parseFloat(product.price.toString()).toLocaleString()}
-                  </div>
-
-                  <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
-                      stockStatus === 'high'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : stockStatus === 'low'
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}
-                  >
-                    <FiPackage />
-                    {stockStatus === 'out'
-                      ? 'Out of Stock'
-                      : `${product.stock_quantity} in stock`}
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      onClick={handleWishlist}
-                      className={`p-4 rounded-xl transition-all ${
-                        isWishlisted
-                          ? 'bg-red-100 text-red-500'
-                          : 'bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500'
-                      }`}
-                    >
-                      <FiHeart
-                        className={isWishlisted ? 'fill-current' : ''}
-                        size={24}
-                      />
-                    </button>
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={loading || stockStatus === 'out'}
-                      className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold transition-all ${
-                        addedToCart
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : stockStatus === 'out'
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      }`}
-                    >
-                      {loading ? (
-                        <ImSpinner2 className="animate-spin" size={22} />
-                      ) : addedToCart ? (
-                        <>
-                          <FiCheck size={22} />
-                          Added to Cart
-                        </>
-                      ) : (
-                        <>
-                          <FiShoppingCart size={22} />
-                          Add to Cart
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowQuickView(false)}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Quick View Modal - Rendered via Portal */}
+      <QuickViewModal
+        show={showQuickView}
+        onClose={() => setShowQuickView(false)}
+        product={product}
+        stockStatus={stockStatus}
+        isWishlisted={isWishlisted}
+        handleWishlist={handleWishlist}
+        handleAddToCart={handleAddToCart}
+        loading={loading}
+        addedToCart={addedToCart}
+      />
     </>
   );
+}
+
+// Separate Modal Component with Portal
+function QuickViewModal({
+  show,
+  onClose,
+  product,
+  stockStatus,
+  isWishlisted,
+  handleWishlist,
+  handleAddToCart,
+  loading,
+  addedToCart,
+}: {
+  show: boolean;
+  onClose: () => void;
+  product: Product;
+  stockStatus: 'high' | 'low' | 'out';
+  isWishlisted: boolean;
+  handleWishlist: () => void;
+  handleAddToCart: () => void;
+  loading: boolean;
+  addedToCart: boolean;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [show]);
+
+  if (!mounted || !show) return null;
+
+  const modalContent = (
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ zIndex: 9999 }}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div
+        className="relative bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden"
+        style={{ animation: 'modalIn 0.2s ease-out' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-20 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+        >
+          <FiX className="w-5 h-5 text-gray-600" />
+        </button>
+
+        <div className="flex flex-col sm:flex-row">
+          {/* Product Image */}
+          <div className="sm:w-2/5 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center">
+            <div className="w-full aspect-square bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center">
+              <FiPackage className="text-6xl sm:text-7xl text-emerald-400" />
+            </div>
+          </div>
+
+          {/* Product Info */}
+          <div className="sm:w-3/5 p-6 flex flex-col">
+            {/* Stock Badge */}
+            <div className="mb-3">
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  stockStatus === 'high'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : stockStatus === 'low'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-red-100 text-red-700'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    stockStatus === 'high'
+                      ? 'bg-emerald-500'
+                      : stockStatus === 'low'
+                      ? 'bg-amber-500'
+                      : 'bg-red-500'
+                  }`}
+                />
+                {stockStatus === 'out'
+                  ? 'Out of Stock'
+                  : stockStatus === 'low'
+                  ? 'Low Stock'
+                  : 'In Stock'}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+              {product.name}
+            </h2>
+
+            {/* Price */}
+            <div className="text-2xl sm:text-3xl font-bold text-emerald-600 mb-3">
+              Rs {parseFloat(product.price.toString()).toLocaleString()}
+            </div>
+
+            {/* Description */}
+            <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+              {product.description}
+            </p>
+
+            {/* Stock Info */}
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 pb-4 border-b border-gray-100">
+              <FiPackage className="text-emerald-500" />
+              <span>
+                <strong className="text-gray-700">
+                  {product.stock_quantity}
+                </strong>{' '}
+                items available
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleWishlist}
+                className={`p-3 rounded-xl border-2 transition-all ${
+                  isWishlisted
+                    ? 'border-red-200 bg-red-50 text-red-500'
+                    : 'border-gray-200 text-gray-400 hover:border-red-200 hover:bg-red-50 hover:text-red-500'
+                }`}
+              >
+                <FiHeart
+                  className={isWishlisted ? 'fill-current' : ''}
+                  size={20}
+                />
+              </button>
+              <button
+                onClick={handleAddToCart}
+                disabled={loading || stockStatus === 'out'}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
+                  addedToCart
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : stockStatus === 'out'
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                }`}
+              >
+                {loading ? (
+                  <ImSpinner2 className="animate-spin" size={20} />
+                ) : addedToCart ? (
+                  <>
+                    <FiCheck size={20} />
+                    Added
+                  </>
+                ) : (
+                  <>
+                    <FiShoppingCart size={20} />
+                    Add to Cart
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @keyframes modalIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
+    </div>
+  );
+
+  return createPortal(modalContent, document.body);
 }
