@@ -22,7 +22,7 @@ create database ecommerce_order_management;
 Install the Deps.
 
 ```bash
-npm install
+bun install
 ```
 
 Copy `sample.env.local` to `.env.local`, then add the deps.
@@ -30,14 +30,14 @@ Copy `sample.env.local` to `.env.local`, then add the deps.
 Initialize the DB
 
 ```bash
-npm run seed
+bun run seed
 ```
 
 Run the Project.
 
 ```bash
-npm run build
-npm run start
+bun run build
+bun run start
 ```
 
 To visit the app as ADMIN register as email `ugulzar4512@gmail.com`

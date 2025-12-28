@@ -1,12 +1,20 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import {
+  FiPackage,
+  FiMapPin,
+  FiCalendar,
+  FiCheck,
+  FiClock,
+  FiChevronDown,
+  FiChevronUp,
+  FiCopy,
+} from 'react-icons/fi';
 
 function OrderItem({ order, orderItemsMap }: any) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const items = orderItemsMap[order.order_id] || [];
 
@@ -15,102 +23,132 @@ function OrderItem({ order, orderItemsMap }: any) {
     return sum + price * item.quantity;
   }, 0);
 
-  const handlePay = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: order.order_id,
-          payment_method: 'card', // or 'cash', 'easypaisa', etc.
-          amount: total,
-        }),
-      });
-
-      const data = await res.json();
-      setLoading(false);
-      if (!res.ok) {
-        toast.error(data.error || 'Payment failed');
-        return;
-      }
-
-      toast.success('Payment successful!');
-      router.refresh();
-    } catch (err) {
-      toast.dismiss();
-      toast.error('Something went wrong!');
-      console.error(err);
-    }
+  const copyOrderId = () => {
+    navigator.clipboard.writeText(order.order_id);
+    toast.success('Order ID copied to clipboard!');
   };
 
+  const isPaid = order.status === 'paid';
+
   return (
-    <div
-      key={order.order_id}
-      className="bg-white border border-emerald-100 shadow-md hover:shadow-emerald-200 rounded-2xl p-6 transition"
-    >
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold text-emerald-700">
-          Order #{order.order_id}
-        </h2>
-        <p className="text-gray-600">
-          <span className="font-medium">Status:</span> {order.status}
-        </p>
-        <p className="text-gray-600">
-          <span className="font-medium">Address:</span> {order.address}
-        </p>
-        <p className="text-gray-600">
-          <span className="font-medium">Placed On:</span>{' '}
-          {new Date(order.created_at).toDateString()}
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        {items.map((item: any) => {
-          const { product } = item;
-          const subtotal = parseFloat(product.price) * item.quantity;
-
-          return (
-            <div
-              key={item.product_id}
-              className="border border-emerald-50 rounded-lg p-4 bg-emerald-50"
-            >
-              <h3 className="text-lg font-semibold text-emerald-800">
-                {product.name}
-              </h3>
-              <p className="text-gray-700">{product.description}</p>
-              <div className="text-sm text-gray-600 mt-1">
-                <p>
-                  <span className="font-medium">Price:</span> Rs{' '}
-                  {parseFloat(product.price).toLocaleString()}
-                </p>
-                <p>
-                  <span className="font-medium">Quantity:</span> {item.quantity}
-                </p>
-                <p>
-                  <span className="font-medium">Subtotal:</span> Rs{' '}
-                  {subtotal.toLocaleString()}
-                </p>
-              </div>
+    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden">
+      {/* Order Header */}
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <span
+                className={`badge ${
+                  isPaid ? 'badge-success' : 'badge-warning'
+                }`}
+              >
+                {isPaid ? (
+                  <>
+                    <FiCheck className="mr-1" /> Paid
+                  </>
+                ) : (
+                  <>
+                    <FiClock className="mr-1" /> Unpaid
+                  </>
+                )}
+              </span>
+              <button
+                onClick={copyOrderId}
+                className="text-gray-400 text-sm hover:text-emerald-600 flex items-center gap-1 transition-colors"
+                title="Click to copy full Order ID"
+              >
+                #{order.order_id.slice(0, 8)}...
+                <FiCopy className="text-xs" />
+              </button>
             </div>
-          );
-        })}
+            <h2 className="text-xl font-bold text-gray-900">
+              {items.length} item{items.length !== 1 && 's'}
+            </h2>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-emerald-600">
+              Rs {total.toLocaleString()}
+            </div>
+            <div className="text-gray-400 text-sm">Total Amount</div>
+          </div>
+        </div>
+
+        {/* Order Meta */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <FiMapPin className="text-emerald-500" />
+            <span className="truncate max-w-[200px]">{order.address}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiCalendar className="text-emerald-500" />
+            <span>
+              {new Date(order.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Total */}
-      <div className="text-right mt-6 text-lg text-emerald-800 font-semibold">
-        Total Amount: Rs {total.toLocaleString()}
+      {/* Expandable Items Section */}
+      <div className="border-t border-gray-100">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full px-6 py-3 flex items-center justify-between text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          <span className="font-medium">Order Items ({items.length})</span>
+          {expanded ? <FiChevronUp /> : <FiChevronDown />}
+        </button>
+
+        {expanded && (
+          <div className="px-6 pb-4 space-y-3 animate-fade-in">
+            {items.map((item: any) => {
+              const { product } = item;
+              const subtotal = parseFloat(product.price) * item.quantity;
+
+              return (
+                <div
+                  key={item.product_id}
+                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+                >
+                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-teal-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <FiPackage className="text-2xl text-emerald-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 truncate">
+                      {product.name}
+                    </h3>
+                    <p className="text-gray-500 text-sm truncate">
+                      {product.description}
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-semibold text-gray-900">
+                      Rs {subtotal.toLocaleString()}
+                    </div>
+                    <div className="text-gray-400 text-sm">
+                      {item.quantity} × Rs{' '}
+                      {parseFloat(product.price).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Pay button (only if status is unpaid) */}
-      {order.status === 'unpaid' && (
-        <div className="text-right mt-4">
-          <button
-            onClick={handlePay}
-            className="cursor-pointer px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition"
-          >
-            {loading ? 'Processing...' : 'Pay Now'}
-          </button>
+      {/* Payment Pending Notice */}
+      {!isPaid && (
+        <div className="px-6 py-4 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-amber-100">
+          <div className="flex items-center gap-2 text-amber-700">
+            <FiClock />
+            <span className="font-medium">
+              Payment pending - Pay on delivery
+            </span>
+          </div>
         </div>
       )}
     </div>

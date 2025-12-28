@@ -12,11 +12,11 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
-    "next": "15.3.4",
+    "next": "^16.1.1",
     "next-auth": "^4.24.11",
     "pg": "^8.16.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0"
   },
@@ -25,8 +25,8 @@
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/pg": "^8.15.4",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -35,8 +35,25 @@ export async function POST(req: NextRequest) {
 
     const order_id = orderRes.rows[0].order_id;
 
-    // Insert each item
+    // Insert each item and decrease stock
     for (const item of items) {
+      // Check if enough stock is available
+      const stockCheck = await client.query(
+        'SELECT stock_quantity FROM products WHERE product_id = $1',
+        [item.product_id]
+      );
+
+      if (stockCheck.rows.length === 0) {
+        throw new Error(`Product ${item.product_id} not found`);
+      }
+
+      const availableStock = stockCheck.rows[0].stock_quantity;
+      if (availableStock < item.quantity) {
+        throw new Error(
+          `Insufficient stock for product. Available: ${availableStock}, Requested: ${item.quantity}`
+        );
+      }
+
       await client.query(
         `
         INSERT INTO order_items (order_id, product_id, quantity)
@@ -44,10 +61,16 @@ export async function POST(req: NextRequest) {
         `,
         [order_id, item.product_id, item.quantity]
       );
+
+      // Decrease stock quantity
+      await client.query(
+        'UPDATE products SET stock_quantity = stock_quantity - $1 WHERE product_id = $2',
+        [item.quantity, item.product_id]
+      );
     }
 
     for (const item of items) {
-      await pool.query(
+      await client.query(
         'DELETE FROM cart WHERE user_id = $1 AND product_id = $2 RETURNING *',
         [user_id, item.product_id]
       );

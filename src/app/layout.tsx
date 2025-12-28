@@ -1,30 +1,25 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { getServerSession } from "next-auth";
-import Link from "next/link";
-import { Toaster } from "react-hot-toast";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
-import pool from "@/lib/db";
-import { Header } from "@/components/header";
-import { CartProvider } from "@/contexts/cart-context";
-import { Providers } from "@/components/providers";
-import { authOptions } from "@/lib/auth-options";
+import { CartProvider } from '@/contexts/cart-context';
+import { Providers } from '@/components/providers';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Ecommerce Order Management",
+  title: 'ShopHub - Modern E-commerce Experience',
   description:
-    "A Database Lab Semester Project for managing ecommerce orders in SQL",
+    'Discover a world of quality products at unbeatable prices. Your one-stop destination for everything you need.',
 };
 
 export default async function RootLayout({
@@ -32,48 +27,61 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-
   try {
-    // if database is not connected, error will be shown from the start.
-
     return (
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 bg-emerald-50`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800`}
         >
           <Providers>
-            <CartProvider>
-              <Header />
-              <div className="px-7 pb-7">{children}</div>
-              {session && session.user && session.user.role === "admin" && (
-                <div className="fixed bottom-12 right-10 z-50">
-                  <Link
-                    href="/new"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded shadow-lg font-semibold transition"
-                  >
-                    Create New Product
-                  </Link>
-                </div>
-              )}
-            </CartProvider>
+            <CartProvider>{children}</CartProvider>
           </Providers>
-          <Toaster position="bottom-right" />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#1f2937',
+                color: '#fff',
+                borderRadius: '12px',
+                padding: '16px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </body>
       </html>
     );
   } catch (error) {
-    console.error("Error initializing database:", error);
+    console.error('Error initializing database:', error);
 
     return (
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased text-gray-800 bg-emerald-50`}
         >
-          <Header />
-          <div className="flex items-center justify-center h-[600px]">
-            <div className="p-3 rounded bg-red-600 text-white text-2xl">
-              Something Went wrong.
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl">⚠️</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Connection Error
+              </h1>
+              <p className="text-gray-500">
+                Unable to connect to the database. Please try again later.
+              </p>
             </div>
           </div>
         </body>
